@@ -11,6 +11,11 @@ type item struct {
 	CreatedAt   time.Time
 	CompletedAt time.Time
 }
+type Stack struct {
+	trashedItems []string
+}
+
+var stack Stack
 
 type Saved struct {
 	savedItems []string
@@ -48,10 +53,14 @@ func SaveTask(task *item, saved *Saved) {
 	fmt.Println("Task saved:", task.Task)
 }
 func DeleteTask(saved *Saved) {
-
+	TrashItems(saved, &stack)
 	saved.savedItems = nil
 	fmt.Println("the Saved Task was Deleted", saved.savedItems)
 }
-func TrashItems() {
+func TrashItems(saved *Saved, s *Stack) {
+	for _, task := range saved.savedItems {
+		s.trashedItems = append(s.trashedItems, task)
+	}
+	fmt.Println("Tasks moved to trash:", s.trashedItems)
 
 }
