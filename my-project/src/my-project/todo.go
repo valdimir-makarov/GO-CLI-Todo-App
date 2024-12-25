@@ -64,3 +64,12 @@ func TrashItems(saved *Saved, s *Stack) {
 	fmt.Println("Tasks moved to trash:", s.trashedItems)
 
 }
+func UndoRedo (){//i guess this the most complex function till now 
+	// so the function actually works   undo in o(1) and redo in o(n)
+// in the future i am gonna use AVL trees that will make the redo functionality o(nlongn);
+
+
+
+
+
+}
