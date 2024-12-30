@@ -15,6 +15,16 @@ type item struct {
 	CreatedAt   time.Time
 	CompletedAt time.Time
 }
+type Node struct {
+	task string
+	Next *Node
+}
+
+type LinkedListNode struct {
+	head   *Node
+	tail   *Node
+	length int
+}
 
 type Tree struct {
 	Task       string
@@ -49,7 +59,7 @@ func (tm *TaskManager) Initialize() {
 	tm.currentNode = tm.root
 }
 
-func (tm *TaskManager) AddTask(task string) {
+func (tm *TaskManager) AddTask(task string, LinkedList *LinkedListNode) {
 	t := item{
 		Task:        task,
 		Done:        false,
@@ -58,6 +68,20 @@ func (tm *TaskManager) AddTask(task string) {
 	}
 	tm.tasks = append(tm.tasks, t)
 
+	node := &Node{
+		task: task,
+	}
+	if LinkedList.tail == nil {
+		LinkedList.head = node
+		LinkedList.tail = node
+	} else {
+		LinkedList.tail.Next = node
+		LinkedList.tail = node
+
+	}
+	LinkedList.length++
+	printLinkedListThatWasGenerated(LinkedList)
+
 	newTreeNode := &Tree{
 		Task:       task,
 		ParentNode: tm.currentNode,
@@ -65,7 +89,18 @@ func (tm *TaskManager) AddTask(task string) {
 	}
 	tm.currentNode.ChildNodes = append(tm.currentNode.ChildNodes, newTreeNode)
 	tm.currentNode = newTreeNode
+
 	fmt.Println("Task added:", task)
+}
+func printLinkedListThatWasGenerated(LinkedList *LinkedListNode) {
+
+	currentNode := LinkedList.head
+	for currentNode != nil {
+		fmt.Println(currentNode.task, "Print the LinkedList")
+		currentNode = currentNode.Next
+
+	}
+
 }
 
 func (tm *TaskManager) Undo() {
@@ -142,7 +177,7 @@ func TrashItems(saved *Saved, s *Stack) {
 func main() {
 	tm := &TaskManager{}
 	tm.Initialize()
-
+	linkedList := &LinkedListNode{}
 	saved := Saved{}
 	reader := bufio.NewReader(os.Stdin)
 
@@ -154,7 +189,7 @@ func main() {
 		fmt.Println("Enter your task:")
 		task, _ := reader.ReadString('\n')
 		task = strings.TrimSpace(task)
-		tm.AddTask(task)
+		tm.AddTask(task, linkedList)
 	}
 
 	for {
@@ -167,7 +202,7 @@ func main() {
 			fmt.Println("Enter your task:")
 			task, _ := reader.ReadString('\n')
 			task = strings.TrimSpace(task)
-			tm.AddTask(task)
+			tm.AddTask(task, linkedList)
 		case "complete":
 			fmt.Println("Enter task index to complete:")
 			indexStr, _ := reader.ReadString('\n')
