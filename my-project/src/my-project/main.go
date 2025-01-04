@@ -174,6 +174,80 @@ func TrashItems(saved *Saved, s *Stack) {
 	fmt.Println("Tasks moved to trash:", s.trashedItems)
 }
 
+func MoveDown(ListNode *LinkedListNode, TargetTask string) {
+
+	if ListNode.head == nil || ListNode.head.Next == nil {
+		fmt.Println("Debug: List is empty or has only one node. No movement possible.")
+		return
+	}
+
+	fmt.Println("Debug: Starting MoveDown for task:", TargetTask)
+
+	dummy := &Node{Next: ListNode.head}
+	prev := dummy
+
+	fmt.Println("Debug: Initial linked list:")
+	printLinkedListThatWasGenerated(ListNode)
+
+	for prev.Next != nil && prev.Next.Next != nil {
+		fmt.Println("Debug: Checking node:", prev.Next.task)
+		if prev.Next.task == TargetTask {
+			fmt.Println("Debug: Found target task:", prev.Next.task)
+			break
+		}
+		prev = prev.Next
+	}
+
+	if prev.Next == nil || prev.Next.Next == nil {
+		fmt.Println("Debug: Target task not found or can't be swapped.")
+		return
+	}
+
+	first := prev.Next
+	second := first.Next
+
+	fmt.Printf("Debug: Swapping nodes '%s' and '%s'\n", first.task, second.task)
+	prev.Next = second
+	first.Next = second.Next
+	second.Next = first
+
+	if ListNode.head == first {
+		ListNode.head = second
+	}
+	if first.Next == nil {
+		ListNode.tail = first
+	}
+
+	fmt.Println("Debug: Linked list after swapping:")
+	printLinkedListThatWasGenerated(ListNode)
+}
+func MoveUp(ListNode *LinkedListNode, TargetTask string) {
+
+	if ListNode.head == nil || ListNode.head.Next == nil {
+
+		fmt.Println("the target  node is head or tail")
+		return
+
+	}
+
+	dummy := &Node{Next: ListNode.head}
+	prev := dummy
+
+	for prev.Next != nil && prev.Next.Next != nil {
+
+		if prev.Next.task == TargetTask {
+
+			break
+
+		}
+		prev = prev.Next
+
+	}
+	if prev.Next == nil || prev.Next.Next == nil {
+		return
+	}
+
+}
 func main() {
 	tm := &TaskManager{}
 	tm.Initialize()
@@ -193,7 +267,7 @@ func main() {
 	}
 
 	for {
-		fmt.Println("Enter command (add/complete/delete/list/trash/undo/redo/exit):")
+		fmt.Println("Enter command (add/complete/delete/list/trash/undo/redo/Set low Priority/exit):")
 		command, _ := reader.ReadString('\n')
 		command = strings.TrimSpace(strings.ToLower(command))
 
@@ -231,11 +305,18 @@ func main() {
 			tm.Undo()
 		case "redo":
 			tm.Redo()
+		case "set_low_priority":
+			fmt.Println("Enter the task to move down:")
+			task, _ := reader.ReadString('\n')
+			task = strings.TrimSpace(task)
+
+			MoveDown(linkedList, task)
+
 		case "exit":
 			fmt.Println("Exiting...")
 			return
 		default:
-			fmt.Println("Unknown command. Available commands: add, complete, delete, list, trash, undo, redo, exit")
+			fmt.Println("Unknown command. Available commands: add, complete, delete, list, trash, undo, redo, Set low Priority exit")
 		}
 	}
 }
