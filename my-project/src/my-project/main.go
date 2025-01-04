@@ -21,9 +21,10 @@ type Node struct {
 }
 
 type LinkedListNode struct {
-	head   *Node
-	tail   *Node
-	length int
+	head    *Node
+	tail    *Node
+	NodeMap map[string]*Node
+	length  int
 }
 
 type Tree struct {
@@ -79,6 +80,8 @@ func (tm *TaskManager) AddTask(task string, LinkedList *LinkedListNode) {
 		LinkedList.tail = node
 
 	}
+	//here  i am  using a HashMap to Track the Nodes
+	LinkedList.NodeMap[task] = node
 	LinkedList.length++
 	printLinkedListThatWasGenerated(LinkedList)
 
@@ -187,29 +190,21 @@ func MoveDown(ListNode *LinkedListNode, TargetTask string) {
 	prev := dummy
 
 	fmt.Println("Debug: Initial linked list:")
-	printLinkedListThatWasGenerated(ListNode)
+	// I am finding the targeted Node In O(1) Time here
+	targetNode, exisits := ListNode.NodeMap[TargetTask]
 
-	for prev.Next != nil && prev.Next.Next != nil {
-		fmt.Println("Debug: Checking node:", prev.Next.task)
-		if prev.Next.task == TargetTask {
-			fmt.Println("Debug: Found target task:", prev.Next.task)
-			break
-		}
-		prev = prev.Next
-	}
-
-	if prev.Next == nil || prev.Next.Next == nil {
-		fmt.Println("Debug: Target task not found or can't be swapped.")
+	if !exisits || targetNode.Next == nil {
+		fmt.Println("the targeted Node coulnt bne found")
 		return
 	}
 
-	first := prev.Next
-	second := first.Next
+	first := targetNode
+	second := targetNode.Next
 
-	fmt.Printf("Debug: Swapping nodes '%s' and '%s'\n", first.task, second.task)
-	prev.Next = second
 	first.Next = second.Next
 	second.Next = first
+	ListNode.NodeMap[first.task] = first
+	ListNode.NodeMap[second.task] = second
 
 	if ListNode.head == first {
 		ListNode.head = second
@@ -218,7 +213,37 @@ func MoveDown(ListNode *LinkedListNode, TargetTask string) {
 		ListNode.tail = first
 	}
 
-	fmt.Println("Debug: Linked list after swapping:")
+	// i am finiding the TargetNode In O(N) time ->Below code
+	// for prev.Next != nil && prev.Next.Next != nil {
+	// 	fmt.Println("Debug: Checking node:", prev.Next.task)
+	// 	if prev.Next.task == TargetTask {
+	// 		fmt.Println("Debug: Found target task:", prev.Next.task)
+	// 		break
+	// 	}
+	// 	prev = prev.Next
+	// }
+
+	// if prev.Next == nil || prev.Next.Next == nil {
+	// 	fmt.Println("Debug: Target task not found or can't be swapped.")
+	// 	return
+	// }
+
+	// first := prev.Next
+	// second := first.Next
+
+	// fmt.Printf("Debug: Swapping nodes '%s' and '%s'\n", first.task, second.task)
+	// prev.Next = second
+	// first.Next = second.Next
+	// second.Next = first
+
+	// if ListNode.head == first {
+	// 	ListNode.head = second
+	// }
+	// if first.Next == nil {
+	// 	ListNode.tail = first
+	// }
+
+	// fmt.Println("Debug: Linked list after swapping:")
 	printLinkedListThatWasGenerated(ListNode)
 }
 func MoveUp(ListNode *LinkedListNode, TargetTask string) {
