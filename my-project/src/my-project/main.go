@@ -78,8 +78,8 @@ func (tm *TaskManager) Initialize() {
 // 	})
 
 // }
-func PrioritySuggestions(list List) {
-	slices.Sort(*list, func(a, b item) int {
+func PrioritySuggestions(list *List) {
+	slices.SortFunc(*list, func(a, b item) int {
 		if a.Priority == b.Priority {
 			return cmp.Compare(a.Duration, b.Duration) // Sort by duration if priorities are the same
 		}
@@ -334,7 +334,7 @@ func main() {
 		fmt.Println("Enter your task:")
 		task, _ := reader.ReadString('\n')
 		task = strings.TrimSpace(task)
-		tm.AddTask(task, linkedList)
+
 	}
 
 	for {
@@ -347,7 +347,19 @@ func main() {
 			fmt.Println("Enter your task:")
 			task, _ := reader.ReadString('\n')
 			task = strings.TrimSpace(task)
-			tm.AddTask(task, linkedList)
+
+			var duration, priority int
+			fmt.Print("Enter duration: ")
+			if _, err := fmt.Scanf("%d\n", &duration); err != nil {
+				fmt.Println("Invalid duration input")
+				break
+			}
+
+			fmt.Print("Enter priority: ")
+			if _, err := fmt.Scanf("%d\n", &priority); err != nil {
+				fmt.Println("Invalid priority input")
+				break
+			}
 		case "complete":
 			fmt.Println("Enter task index to complete:")
 			indexStr, _ := reader.ReadString('\n')
@@ -385,6 +397,8 @@ func main() {
 
 		case "exit":
 			fmt.Println("Exiting...")
+		case "suggestpriority":
+			PrioritySuggestions()
 
 		case "searchtask":
 
