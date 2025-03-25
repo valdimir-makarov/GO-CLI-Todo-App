@@ -79,12 +79,23 @@ func (tm *TaskManager) Initialize() {
 
 // }
 func PrioritySuggestions(list *List) {
+
+	if len(*list) == 0 {
+		log.Fatalf("list is empty->PrioritySuggestions function")
+	}
 	slices.SortFunc(*list, func(a, b item) int {
 		if a.Priority == b.Priority {
 			return cmp.Compare(a.Duration, b.Duration) // Sort by duration if priorities are the same
 		}
 		return cmp.Compare(b.Priority, a.Priority) // Higher priority first
 	})
+	// i need to print the list also right
+	fmt.Printf("the suggested Work Priority Lists From Me(your Desktop)")
+	for _, it := range *list {
+		fmt.Printf("Task: %s | Duration: %d | Priority: %d | Created At: %s\n",
+			it.Task, it.Duration, it.Priority, it.CreatedAt.Format(time.RFC3339))
+
+	}
 }
 
 // i have to find the task in o(1) Time
@@ -360,6 +371,7 @@ func main() {
 				fmt.Println("Invalid priority input")
 				break
 			}
+			tm.AddTask(task, linkedList, duration, priority)
 		case "complete":
 			fmt.Println("Enter task index to complete:")
 			indexStr, _ := reader.ReadString('\n')
@@ -399,6 +411,9 @@ func main() {
 			fmt.Println("Exiting...")
 		case "suggestpriority":
 			PrioritySuggestions(&tm.tasks)
+			for _, it := range tm.tasks {
+				fmt.Printf("Tsk:%s", it.Task)
+			}
 
 		case "searchtask":
 
