@@ -398,7 +398,7 @@ func main() {
 		case "exit":
 			fmt.Println("Exiting...")
 		case "suggestpriority":
-			PrioritySuggestions()
+			PrioritySuggestions(&tm.tasks)
 
 		case "searchtask":
 
