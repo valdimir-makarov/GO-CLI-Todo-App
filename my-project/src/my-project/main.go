@@ -2,9 +2,11 @@ package main
 
 import (
 	"bufio"
+	"cmp"
 	"fmt"
 	"log"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -13,6 +15,8 @@ import (
 type item struct {
 	Task        string
 	Done        bool
+	Duration    int
+	Priority    int
 	CreatedAt   time.Time
 	CompletedAt time.Time
 }
@@ -61,12 +65,34 @@ func (tm *TaskManager) Initialize() {
 	tm.currentNode = tm.root
 }
 
+// i am gonna write a function that will priotrize task
+// based on the priority and duration
+// and somehow it will suggest me which task
+// i should complete fast
+// func PrioritySuggetions(list *List) {
+// 	slices.Sort(list, func(i, j int) bool {
+// 		if list[i].Priority == list[j].Priority {
+// 			return list[i].Duration < list[j].Duration
+// 		}
+// 		return list[i].Priority > list[j].Priority
+// 	})
+
+// }
+func PrioritySuggestions(list List) {
+	slices.Sort(*list, func(a, b item) int {
+		if a.Priority == b.Priority {
+			return cmp.Compare(a.Duration, b.Duration) // Sort by duration if priorities are the same
+		}
+		return cmp.Compare(b.Priority, a.Priority) // Higher priority first
+	})
+}
+
 // i have to find the task in o(1) Time
 func FindTask(searchString string, Linklist *LinkedListNode) {
 
 	// i am gonna use a hashmap for instant lookup
 	result, notfound := Linklist.NodeMap[searchString]
-	if notfound {
+	if !notfound {
 
 		log.Fatalf("the Searched Task dosent exists")
 
@@ -75,7 +101,7 @@ func FindTask(searchString string, Linklist *LinkedListNode) {
 
 }
 
-func (tm *TaskManager) AddTask(task string, LinkedList *LinkedListNode) {
+func (tm *TaskManager) AddTask(task string, LinkedList *LinkedListNode, Duration int, priority int) {
 
 	if LinkedList.NodeMap == nil { // ✅ Prevent panic
 		LinkedList.NodeMap = make(map[string]*Node)
@@ -84,6 +110,8 @@ func (tm *TaskManager) AddTask(task string, LinkedList *LinkedListNode) {
 	t := item{
 		Task:        task,
 		Done:        false,
+		Duration:    Duration,
+		Priority:    priority,
 		CreatedAt:   time.Now(),
 		CompletedAt: time.Time{},
 	}
