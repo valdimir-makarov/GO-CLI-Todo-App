@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -60,7 +61,26 @@ func (tm *TaskManager) Initialize() {
 	tm.currentNode = tm.root
 }
 
+// i have to find the task in o(1) Time
+func FindTask(searchString string, Linklist *LinkedListNode) {
+
+	// i am gonna use a hashmap for instant lookup
+	result, notfound := Linklist.NodeMap[searchString]
+	if notfound {
+
+		log.Fatalf("the Searched Task dosent exists")
+
+	}
+	log.Printf("The task` is Found", result.task)
+
+}
+
 func (tm *TaskManager) AddTask(task string, LinkedList *LinkedListNode) {
+
+	if LinkedList.NodeMap == nil { // ✅ Prevent panic
+		LinkedList.NodeMap = make(map[string]*Node)
+	}
+
 	t := item{
 		Task:        task,
 		Done:        false,
@@ -80,6 +100,7 @@ func (tm *TaskManager) AddTask(task string, LinkedList *LinkedListNode) {
 		LinkedList.tail = node
 
 	}
+
 	//here  i am  using a HashMap to Track the Nodes
 	LinkedList.NodeMap[task] = node
 	LinkedList.length++
@@ -185,9 +206,6 @@ func MoveDown(ListNode *LinkedListNode, TargetTask string) {
 	}
 
 	fmt.Println("Debug: Starting MoveDown for task:", TargetTask)
-
-	dummy := &Node{Next: ListNode.head}
-	prev := dummy
 
 	fmt.Println("Debug: Initial linked list:")
 	// I am finding the targeted Node In O(1) Time here
@@ -339,6 +357,14 @@ func main() {
 
 		case "exit":
 			fmt.Println("Exiting...")
+
+		case "searchtask":
+
+			searchedTask, _ := reader.ReadString('\n')
+			searchedTask = strings.TrimSpace(searchedTask)
+			FindTask(searchedTask, linkedList)
+
+			fmt.Println("")
 			return
 		default:
 			fmt.Println("Unknown command. Available commands: add, complete, delete, list, trash, undo, redo, Set low Priority exit")
